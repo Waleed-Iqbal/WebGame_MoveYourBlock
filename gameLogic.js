@@ -1,21 +1,16 @@
-var width = 1500;
-var height = 700;
+const WIDTH = 1500;
+const HEIGHT = 700;
 
 function printChar() { // :D
 
-    if (x >= width) {
+    if (x <= 0 || x >= WIDTH) {
         spdx = -spdx;
-    } else if (x <= 0)
-        spdx = Math.abs(spdx);
-    else if (y >= height) {
+    else if ( y <= 0 || y >= HEIGHT) {
         spdy = -spdy;
-    } else if (y <= 0)
-        spdy = Math.abs(spdy);
 
     x += spdx;
     y += spdy;
     ctx.fillText("!", x, y);
-    //if (x >= width) clearInterval(printChar);
 }
 
 
