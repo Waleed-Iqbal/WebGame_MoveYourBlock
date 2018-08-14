@@ -2,9 +2,12 @@
 
     var canvas = document.getElementById("ctx");
     var ctx = canvas.getContext("2d");
-    var enemiesList = {};
+    ctx.font = "40px Arial";
 
-    function enemyFactory(Id, PositionX, PositionY, SpeedX, SpeedY, Content) {
+    var enemiesList = {};
+    var timeGameStarted = Date.now();
+
+    function enemyFactory(Id, PositionX, PositionY, SpeedX, SpeedY, Content, Width, Height) {
         enemiesList[Id] = {
             id: Id,
             text: Content,
@@ -12,6 +15,8 @@
             speedY: SpeedY,
             posX: PositionX,
             posY: PositionY,
+            width: Width,
+            height: Height
         };
     }
 
@@ -22,20 +27,30 @@
         speedY: 50,
         posX: -3,
         posY: -2,
-        health: 10
+        health: 10,
+        width: Constants.PLAYER_HEIGHT,
+        height: Constants.PLAYER_WIDTH
     };
 
     function createPlayers() {
-        playerFactory(1, 50, 50, 2, -2, "E0");
-        playerFactory(2, 300, 540, 2, 3, "E1");
-        playerFactory(3, 300, 140, 2, 3, "E2");
+        enemyFactory(1, 50, 50, 2, -2, "E0", 30, 30);
+        enemyFactory(2, 300, 540, 2, 3, "E1", 30, 30);
+        enemyFactory(3, 300, 140, 2, 3, "E2", 30, 30);
     }
 
-    ctx.font = "40px Arial";
 
+    function drawPlayer(character) {
+        ctx.save();
+        ctx.fillStyle = 'green';
+        ctx.fillRect(character.posX - 10, character.posY - 10, 20, 20);
+        ctx.restore();
+    }
 
-    function drawCharacter(character) {
-        ctx.fillText(character.text, character.posX, character.posY);
+    function drawEnemy(character) {
+        ctx.save();
+        ctx.fillStyle = 'red';
+        ctx.fillRect(character.posX - 15, character.posY - 15, 30, 30);
+        ctx.restore();
     }
 
     function updateCharacterPosition(character) {
@@ -50,7 +65,7 @@
 
     function updateCharacter(character) {
         updateCharacterPosition(character);
-        drawCharacter(character);
+        drawEnemy(character);
     }
 
     createPlayers();
@@ -60,18 +75,24 @@
 
         for (var enemy in enemiesList) {
             updateCharacter(enemiesList[enemy]);
-            if (Physics.arePlayerAndEnemyColliding(player, enemiesList[enemy]))
+            if (Physics.arePlayerAndEnemyColliding(player, enemiesList[enemy])) {
                 player.health -= 1;
+                if (player.health <= 0) {
+                    let timeSurvived = Date.now() - timeGameStarted;
+                    console.log("You Lost after " + timeSurvived / 1000 + " sec");
+                    player.health = 10;
+                }
+            }
         }
 
-        drawCharacter(player);
-
+        drawPlayer(player);
+        ctx.fillText(player.health + " HP", 0, 30);
     }
     setInterval(updateCanvas, 1);
 
     document.onmousemove = function (e) {
-        player.posX = e.clientX - Constants.CURSOR_OFFSET_X;
-        player.posY = e.clientY - Constants.CURSOR_OFFSET_Y;
+        player.posX = e.clientX;
+        player.posY = e.clientY;
     }
 
 }())
