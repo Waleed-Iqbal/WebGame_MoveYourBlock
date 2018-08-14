@@ -13,7 +13,11 @@ var Constants = (function(){
         ENEMY_HEIGHT: 30,
         ENEMY_WIDTH: 30,
         PLAYER_HEIGHT: 20,
-        PLAYER_WIDTH: 20
+        PLAYER_WIDTH: 20,
+        MIN_ENEMY_HEIGHT: 10,
+        MIN_ENEMY_WIDTH: 10,
+        MIN_SPEED_X: 5,
+        MIN_SPEED_Y: 5
     }
 
 }())

@@ -3,20 +3,22 @@
     var canvas = document.getElementById("ctx");
     var ctx = canvas.getContext("2d");
     ctx.font = "40px Arial";
+    var frameCount = 0;
 
     var enemiesList = {};
     var timeGameStarted = Date.now();
 
-    function enemyFactory(Id, PositionX, PositionY, SpeedX, SpeedY, Content, Width, Height) {
+    function randomEnemyGenerator() {
+        let Id = Math.random();
         enemiesList[Id] = {
-            id: Id,
-            text: Content,
-            speedX: SpeedX,
-            speedY: SpeedY,
-            posX: PositionX,
-            posY: PositionY,
-            width: Width,
-            height: Height
+            id: Math.random(),
+            speedX: Constants.MIN_SPEED_X + Math.random() * Constants.MIN_SPEED_X,
+            speedY: Constants.MIN_SPEED_Y + Math.random() * Constants.MIN_SPEED_Y,
+            posX: Math.random() * canvas.width,
+            posY: Math.random() * canvas.height,
+            width: Constants.MIN_ENEMY_WIDTH + Math.random() * Constants.ENEMY_WIDTH,
+            height: Constants.MIN_ENEMY_HEIGHT + Math.random() * Constants.ENEMY_HEIGHT,
+            color: "red"
         };
     }
 
@@ -29,27 +31,21 @@
         posY: -2,
         health: 10,
         width: Constants.PLAYER_HEIGHT,
-        height: Constants.PLAYER_WIDTH
+        height: Constants.PLAYER_WIDTH,
+        color: "green"
     };
 
-    function createPlayers() {
-        enemyFactory(1, 50, 50, 2, -2, "E0", 30, 30);
-        enemyFactory(2, 300, 540, 2, 3, "E1", 30, 30);
-        enemyFactory(3, 300, 140, 2, 3, "E2", 30, 30);
+    function createEnemies() {
+        randomEnemyGenerator();
+        randomEnemyGenerator();
+        randomEnemyGenerator();
     }
 
 
-    function drawPlayer(character) {
+    function drawCharacter(character) {
         ctx.save();
-        ctx.fillStyle = 'green';
-        ctx.fillRect(character.posX - 10, character.posY - 10, 20, 20);
-        ctx.restore();
-    }
-
-    function drawEnemy(character) {
-        ctx.save();
-        ctx.fillStyle = 'red';
-        ctx.fillRect(character.posX - 15, character.posY - 15, 30, 30);
+        ctx.fillStyle = character.color;
+        ctx.fillRect(character.posX - character.width / 2, character.posY - character.height / 2, character.width, character.height);
         ctx.restore();
     }
 
@@ -65,10 +61,19 @@
 
     function updateCharacter(character) {
         updateCharacterPosition(character);
-        drawEnemy(character);
+        drawCharacter(character);
     }
 
-    createPlayers();
+    createEnemies();
+
+    function startNewGame() {
+        frameCount = 0;
+        player.health = 10;
+        enemiesList = {};
+        timeGameStarted = Date.now();
+        createEnemies();
+    }
+
 
     function updateCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -77,22 +82,44 @@
             updateCharacter(enemiesList[enemy]);
             if (Physics.arePlayerAndEnemyColliding(player, enemiesList[enemy])) {
                 player.health -= 1;
-                if (player.health <= 0) {
-                    let timeSurvived = Date.now() - timeGameStarted;
-                    console.log("You Lost after " + timeSurvived / 1000 + " sec");
-                    player.health = 10;
-                }
             }
         }
 
-        drawPlayer(player);
+        if (player.health <= 0) {
+            let timeSurvived = Date.now() - timeGameStarted;
+            console.log("You Lost after " + timeSurvived / 1000 + " sec");
+            startNewGame(); 
+        }
+
+        drawCharacter(player);
         ctx.fillText(player.health + " HP", 0, 30);
+
+
+        // add enemy after 10 seconds
+        ++frameCount;
+        if (frameCount % 340 === 0)
+            randomEnemyGenerator();
     }
-    setInterval(updateCanvas, 1);
 
     document.onmousemove = function (e) {
-        player.posX = e.clientX;
-        player.posY = e.clientY;
+        let newPosX = e.clientX - canvas.getBoundingClientRect().left /*To have cursor in middle of player's box */ ;
+        let newPosY = e.clientY - canvas.getBoundingClientRect().top /*To have cursor in middle of player's box */ ;
+
+        if (newPosX < player.width / 2)
+            newPosX = player.width / 2;
+        else if (newPosX > canvas.width - player.width / 2)
+            newPosX = canvas.width - player.width / 2;
+        if (newPosY < player.height / 2)
+            newPosY = player.height / 2;
+        else if (newPosY > canvas.height - player.height / 2)
+            newPosY = canvas.height - player.height / 2;
+
+
+        player.posX = newPosX;
+        player.posY = newPosY;
     }
+
+
+    setInterval(updateCanvas, 34); // to make it 30 FPS
 
 }())

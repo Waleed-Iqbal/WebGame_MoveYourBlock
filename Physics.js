@@ -8,24 +8,7 @@ var Physics = (function(){
     // }
 
     function arePlayerAndEnemyColliding(Player, Enemy) {
-        let playerRect = {
-            posX: Player.posX - (Player.width/2),
-            posY: Player.posY - (Player.height/2),
-            width: Player.width,
-            height: Player.height
-        };
-
-        let enemyRect = {
-            posX: Enemy.posX - (Enemy.width/2),
-            posY: Enemy.posY - (Enemy.height/2),
-            width: Enemy.width,
-            height: Enemy.height
-        };
-
-        let areColliding = playerRect.posX <= enemyRect.posX + enemyRect.width
-                        && enemyRect.posX <= playerRect.posX + playerRect.innerWidth
-                        && playerRect.posX <= enemyRect.posY + enemyRect.height
-                        && playerRect.posY <= playerRect.posY + playerRect.height
+        let areColliding = Player.posX <= Enemy.posX + Enemy.width && Enemy.posX <= Player.posX + Player.width && Player.posX <= Enemy.posY + Enemy.height && Enemy.posY <= Player.posY + Player.height;
         return areColliding;
     }
 
