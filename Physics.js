@@ -7,13 +7,12 @@ var Physics = (function(){
         return distance;
     }
 
-    function areTwoPlayerColliding(PlayerA, PlayerB){
-        let areColliding = getDistanceBetweenTwoPlayers(PlayerA, PlayerB) < Constants.COLLISION_THRESHOLD;
-
+    function arePlayerAndEnemyColliding(Player, Enemy){
+        let areColliding = getDistanceBetweenTwoPlayers(Player, Enemy) < Constants.COLLISION_THRESHOLD;
         return areColliding;
     }
 
     return {
-        areTwoPlayerColliding: areTwoPlayerColliding
+        arePlayerAndEnemyColliding: arePlayerAndEnemyColliding
     };
 }())
