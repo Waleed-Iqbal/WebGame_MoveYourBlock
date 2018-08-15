@@ -4,6 +4,7 @@
     var ctx = canvas.getContext("2d");
     ctx.font = "40px Arial";
     var frameCount = 0;
+    var score = 0;
 
     var enemiesList = {};
     var timeGameStarted = Date.now();
@@ -68,6 +69,7 @@
 
     function startNewGame() {
         frameCount = 0;
+        score = 0;
         player.health = 10;
         enemiesList = {};
         timeGameStarted = Date.now();
@@ -93,10 +95,12 @@
 
         drawCharacter(player);
         ctx.fillText(player.health + " HP", 0, 30);
+        ctx.fillText(score + " HP", 390, 30);
 
 
         // add enemy after 10 seconds
         ++frameCount;
+        ++score;
         if (frameCount % 340 === 0)
             randomEnemyGenerator();
     }
