@@ -17,7 +17,13 @@ var Constants = (function(){
         MIN_ENEMY_HEIGHT: 10,
         MIN_ENEMY_WIDTH: 10,
         MIN_SPEED_X: 5,
-        MIN_SPEED_Y: 5
+        MIN_SPEED_Y: 5,
+        UPGRADE_HEIGHT: 10,
+        UPGRADE_WIDTH: 10,
+        BULLET_HEIGHT: 10,
+        BULLET_WIDTH: 10,
+        UPGRADE_SPEED_X: 0,
+        UPGRADE_SPEED_Y: 0
     }
 
 }())

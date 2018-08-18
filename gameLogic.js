@@ -4,9 +4,13 @@
     var ctx = canvas.getContext("2d");
     ctx.font = "40px Arial";
     var frameCount = 0;
+    var hasPlayerCollided = false;
     var score = 0;
 
     var enemiesList = {};
+    var upgradeList = {};
+    var bulletList = {};
+
     var timeGameStarted = Date.now();
 
     function randomEnemyGenerator() {
@@ -22,6 +26,37 @@
             color: "red"
         };
     }
+
+    function randomUpgradeGenerator() {
+        let Id = Math.random();
+        upgradeList[Id] = {
+            id: Math.random(),
+            speedX: Constants.UPGRADE_SPEED_X,
+            speedY: Constants.UPGRADE_SPEED_Y,
+            posX: Math.random() * canvas.width,
+            posY: Math.random() * canvas.height,
+            width: Constants.UPGRADE_HEIGHT,
+            height: Constants.UPGRADE_WIDTH,
+            color: "orange"
+        };
+    }
+
+    function randomBulletGenerator() {
+        let Id = Math.random();
+        let angle = Math.random()*360;
+        angle = (angle / 180) * Math.PI;
+        bulletList[Id] = {
+            id: Math.random(),
+            speedX: Math.cos(angle) * 5,
+            speedY: Math.sin(angle) * 5,
+            posX: player.posX,
+            posY: player.posY,
+            width: Constants.BULLET_HEIGHT,
+            height: Constants.BULLET_WIDTH,
+            color: "black"
+        };
+    }
+
 
     var player = {
         id: 0,
@@ -50,7 +85,7 @@
         ctx.restore();
     }
 
-    function updateCharacterPosition(character) {
+    function updateEnemyPosition(character) {
         character.posX += character.speedX;
         character.posY += character.speedY;
 
@@ -60,9 +95,9 @@
             character.speedY = -character.speedY;
     }
 
-    function updateCharacter(character) {
-        updateCharacterPosition(character);
-        drawCharacter(character);
+    function updateEnemy(enemy) {
+        updateEnemyPosition(enemy);
+        drawCharacter(enemy);
     }
 
     createEnemies();
@@ -72,25 +107,47 @@
         score = 0;
         player.health = 10;
         enemiesList = {};
+        upgradeList = {};
+        bulletList = {};
         timeGameStarted = Date.now();
         createEnemies();
     }
 
+    function handlePlayerCollision() {
+        if (frameCount % 10 === 0 && hasPlayerCollided) {
+            player.health -= 1;
+            hasPlayerCollided = false;
+        }
+    }
 
     function updateCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);        
 
-        for (var enemy in enemiesList) {
-            updateCharacter(enemiesList[enemy]);
-            if (Physics.arePlayerAndEnemyColliding(player, enemiesList[enemy])) {
-                player.health -= 1;
+        for (var upgrade in upgradeList) {
+            drawCharacter(upgradeList[upgrade]);
+            if (Physics.arePlayerAndEnemyColliding(player, upgradeList[upgrade])) {
+                player.health += 1;
+                delete upgradeList[upgrade];
             }
         }
+
+        for (var bullet in bulletList) {
+            updateEnemy(bulletList[bullet]);
+        }
+
+        for (var enemy in enemiesList) {
+            updateEnemy(enemiesList[enemy]);
+            if (Physics.arePlayerAndEnemyColliding(player, enemiesList[enemy]) && !hasPlayerCollided) {
+                hasPlayerCollided = true;
+                handlePlayerCollision();
+            }
+        }
+        handlePlayerCollision();
 
         if (player.health <= 0) {
             let timeSurvived = Date.now() - timeGameStarted;
             console.log("You Lost after " + timeSurvived / 1000 + " sec");
-            startNewGame(); 
+            startNewGame();
         }
 
         drawCharacter(player);
@@ -98,11 +155,21 @@
         ctx.fillText(score + " HP", 390, 30);
 
 
-        // add enemy after 10 seconds
         ++frameCount;
         ++score;
-        if (frameCount % 340 === 0)
+
+
+
+        // add an upgrade and enemy after 5 seconds
+        if (frameCount % 170 === 0) {
             randomEnemyGenerator();
+            randomUpgradeGenerator();
+        }
+
+        if(frameCount % 34 === 0){
+            randomBulletGenerator();
+            drawCharacter()
+        }
     }
 
     document.onmousemove = function (e) {
