@@ -16,8 +16,8 @@ var Player = (function () {
     var height = Constants.PLAYER_WIDTH;
     var width = Constants.PLAYER_HEIGHT;
 
-    function collisionHandler(frameCount) {
-        if (frameCount % 10 === 0 && hasCollided) {
+    function collisionHandler(FrameCount) {
+        if (FrameCount % 10 === 0 && hasCollided) {
             health -= 1;
             hasCollided = false;
         }

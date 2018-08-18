@@ -1,26 +1,26 @@
 var Common = (function () {
 
-    function updateCharacterPosition(character) {
+    function updateCharacterPosition(Character) {
 
-        character.posX += character.speedX;
-        character.posY += character.speedY;
+        Character.posX += Character.speedX;
+        Character.posY += Character.speedY;
 
-        if (character.posX <= Constants.LOWER_X_BOUND || character.posX >= Canvas.canvas.width - Constants.UPPER_X_BOUNDING_PADDING)
-            character.speedX = -character.speedX;
-        else if (character.posY <= Constants.LOWER_Y_BOUND || character.posY >=  Canvas.canvas.height)
-            character.speedY = -character.speedY;
+        if (Character.posX <= Constants.LOWER_X_BOUND || Character.posX >= Canvas.canvas.width - Constants.UPPER_X_BOUNDING_PADDING)
+            Character.speedX = -Character.speedX;
+        else if (Character.posY <= Constants.LOWER_Y_BOUND || Character.posY >=  Canvas.canvas.height)
+            Character.speedY = -Character.speedY;
     }
 
-    function drawCharacter(character, canvasContext) {
-        canvasContext.save();
-        canvasContext.fillStyle = character.color;
-        canvasContext.fillRect(character.posX - character.width / 2, character.posY - character.height / 2, character.width, character.height);
-        canvasContext.restore();
+    function drawCharacter(Character, CanvasContext) {
+        CanvasContext.save();
+        CanvasContext.fillStyle = Character.color;
+        CanvasContext.fillRect(Character.posX - Character.width / 2, Character.posY - Character.height / 2, Character.width, Character.height);
+        CanvasContext.restore();
     }
 
-    function updateCharacterPositionAndDraw(enemy, canvasContext) {
-        updateCharacterPosition(enemy);
-        drawCharacter(enemy, canvasContext);
+    function updateCharacterPositionAndDraw(Enemy, CanvasContext) {
+        updateCharacterPosition(Enemy);
+        drawCharacter(Enemy, CanvasContext);
     }
 
     return {
