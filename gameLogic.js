@@ -43,7 +43,7 @@
 
     function randomBulletGenerator() {
         let Id = Math.random();
-        let angle = Math.random()*360;
+        let angle = Math.random() * 360;
         angle = (angle / 180) * Math.PI;
         bulletList[Id] = {
             id: Math.random(),
@@ -53,7 +53,8 @@
             posY: player.posY,
             width: Constants.BULLET_HEIGHT,
             height: Constants.BULLET_WIDTH,
-            color: "black"
+            color: "black",
+            timer: 0
         };
     }
 
@@ -121,7 +122,7 @@
     }
 
     function updateCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         for (var upgrade in upgradeList) {
             drawCharacter(upgradeList[upgrade]);
@@ -131,8 +132,27 @@
             }
         }
 
-        for (var bullet in bulletList) {
+        for (var bullet in bulletList) { 
+
+            let toRemove = false;
+
             updateEnemy(bulletList[bullet]);
+            bulletList[bullet].timer++;
+            if(bulletList[bullet].timer > 70) {             
+                toRemove = true;
+            }
+
+            for (var enemy in enemiesList) {
+                if (Physics.arePlayerAndEnemyColliding(bulletList[bullet], enemiesList[enemy])) {
+                    delete bulletList[bullet];
+                    delete enemiesList[enemy];
+                    break;
+                }
+            }
+
+            if(toRemove) {
+                delete bulletList[bullet];
+            }
         }
 
         for (var enemy in enemiesList) {
@@ -166,7 +186,7 @@
             randomUpgradeGenerator();
         }
 
-        if(frameCount % 34 === 0){
+        if (frameCount % 34 === 0) {
             randomBulletGenerator();
             drawCharacter()
         }
