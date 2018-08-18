@@ -27,6 +27,7 @@
             if (Upgrades.upgradeList[upgradeKey].timer >= 200)
                 toRemove = true;
 
+            Common.drawCharacter(Upgrades.upgradeList[upgradeKey], Canvas.context);
 
             if (Physics.arePlayerAndCharacterColliding(Player, Upgrades.upgradeList[upgradeKey])) {
                 Player.health += 1;
