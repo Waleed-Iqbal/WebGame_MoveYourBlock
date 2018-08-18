@@ -37,7 +37,8 @@
             posY: Math.random() * canvas.height,
             width: Constants.UPGRADE_HEIGHT,
             height: Constants.UPGRADE_WIDTH,
-            color: "orange"
+            color: "orange",
+            timer: 0
         };
     }
 
@@ -58,7 +59,6 @@
         };
     }
 
-
     var player = {
         id: 0,
         text: "P",
@@ -69,7 +69,11 @@
         health: 10,
         width: Constants.PLAYER_HEIGHT,
         height: Constants.PLAYER_WIDTH,
-        color: "green"
+        color: "green",
+        pressingUp: false,
+        pressingDown: false,
+        pressingLeft: false,
+        pressingRight: false,
     };
 
     function createEnemies() {
@@ -77,7 +81,6 @@
         randomEnemyGenerator();
         randomEnemyGenerator();
     }
-
 
     function drawCharacter(character) {
         ctx.save();
@@ -121,24 +124,50 @@
         }
     }
 
+
+    function updatePlayerPosition() {
+        if (player.pressingRight)
+            player.posX += 5;
+        if (player.pressingLeft)
+            player.posX -= 5;
+        if (player.pressingDown)
+            player.posY += 5;
+        if (player.pressingUp)
+            player.posY -= 5;
+    }
+
     function updateCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+        
+
+
+
         for (var upgrade in upgradeList) {
+            let toRemove = false;
+            upgradeList[upgrade].timer++;
+
+            if (upgradeList[upgrade].timer >= 200)
+                toRemove = true;
+
             drawCharacter(upgradeList[upgrade]);
+
             if (Physics.arePlayerAndEnemyColliding(player, upgradeList[upgrade])) {
                 player.health += 1;
                 delete upgradeList[upgrade];
             }
+
+            if (toRemove)
+                delete upgradeList[upgrade];
         }
 
-        for (var bullet in bulletList) { 
+        for (var bullet in bulletList) {
 
             let toRemove = false;
 
             updateEnemy(bulletList[bullet]);
             bulletList[bullet].timer++;
-            if(bulletList[bullet].timer > 70) {             
+            if (bulletList[bullet].timer > 70) {
                 toRemove = true;
             }
 
@@ -150,7 +179,7 @@
                 }
             }
 
-            if(toRemove) {
+            if (toRemove) {
                 delete bulletList[bullet];
             }
         }
@@ -170,31 +199,31 @@
             startNewGame();
         }
 
-        drawCharacter(player);
-        ctx.fillText(player.health + " HP", 0, 30);
-        ctx.fillText(score + " HP", 390, 30);
-
-
         ++frameCount;
         ++score;
 
-
-
-        // add an upgrade and enemy after 5 seconds
-        if (frameCount % 170 === 0) {
+        // add an upgrade and enemy after 10 seconds
+        if (frameCount % 340 === 0) {
             randomEnemyGenerator();
             randomUpgradeGenerator();
         }
 
         if (frameCount % 34 === 0) {
             randomBulletGenerator();
-            drawCharacter()
         }
+
+        updatePlayerPosition();
+        drawCharacter(player);
+        ctx.fillText(player.health + " HP", 0, 30);
+        ctx.fillText(Math.floor(score/5) + " HP", 390, 30);
+        
     }
 
     document.onmousemove = function (e) {
-        let newPosX = e.clientX - canvas.getBoundingClientRect().left /*To have cursor in middle of player's box */ ;
-        let newPosY = e.clientY - canvas.getBoundingClientRect().top /*To have cursor in middle of player's box */ ;
+
+        /*To have cursor in middle of player's box */
+        let newPosX = e.clientX - canvas.getBoundingClientRect().left;
+        let newPosY = e.clientY - canvas.getBoundingClientRect().top;
 
         if (newPosX < player.width / 2)
             newPosX = player.width / 2;
@@ -209,6 +238,63 @@
         player.posX = newPosX;
         player.posY = newPosY;
     }
+
+    document.onkeydown = function (e) {
+        switch (e.keyCode) {
+            case 68: // d
+            case 39: // right
+                player.pressingRight = true;
+                break;
+
+            case 83: // s,
+            case 40: // down,
+                player.pressingDown = true;
+                break;
+
+            case 65: // a
+            case 37: // left
+                player.pressingLeft = true;
+                break;
+
+            case 87: // w
+            case 38: // up
+                player.pressingUp = true;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    document.onkeyup = function (e) {
+        switch (e.keyCode) {
+            case 68: // d
+            case 39: // right
+                player.pressingRight = false;
+                break;
+
+            case 83: // s,
+            case 40: // down,
+                player.pressingDown = false;
+                break;
+
+            case 65: // a
+            case 37: // left
+                player.pressingLeft = false;
+                break;
+
+            case 87: // w
+            case 38: // up
+                player.pressingUp = false;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+
+
 
 
     setInterval(updateCanvas, 34); // to make it 30 FPS
